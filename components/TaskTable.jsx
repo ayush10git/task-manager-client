@@ -152,11 +152,10 @@ export default function TaskTable() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [filter, setFilter] = useState("All");
   const [open, setOpen] = useState(false);
-  const [tasks, setTasks] = useState([]); // Store tasks
+  const [tasks, setTasks] = useState([]);
   const [taskData, setTaskData] = useState(null);
   const { data: session, status } = useSession();
   const [userEmail, setUserEmail] = useState("");
-  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     if (status === "authenticated" && session?.user?.email) {
@@ -250,7 +249,7 @@ export default function TaskTable() {
       [...filteredRows]
         .sort(getComparator(order, orderBy))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [order, orderBy, page, rowsPerPage, filteredRows, refreshKey]
+    [order, orderBy, page, rowsPerPage, filteredRows]
   );
 
   const handleInputChange = (event) => {
@@ -282,8 +281,6 @@ export default function TaskTable() {
           task._id === updatedTask._id ? updatedTask : task
         )
       );
-
-      setRefreshKey((prevKey) => prevKey + 1);
 
       setOpen(false);
     } catch (error) {
@@ -327,7 +324,7 @@ export default function TaskTable() {
               <Button
                 className="px-3 py-1 bg-red-500"
                 onClick={handleDeleteSelectedTasks}
-                disabled={selected.length === 0} // Disable if no tasks selected
+                disabled={selected.length === 0}
               >
                 <span className="text-white">Delete</span>
                 <DeleteIcon className="text-white" />
