@@ -179,6 +179,7 @@ export default function TaskTable() {
     }
   }, [userEmail, taskData]);
 
+
   const handleEditTaskOpen = (task) => {
     setTaskData(task);
     setOpen(true);

@@ -16,11 +16,22 @@ import {
   ToggleButtonGroup,
   ToggleButton,
 } from "@mui/material";
-import { addTask } from "@/lib/action";
+import { addTask, getUser, deleteTasks } from "@/lib/action";
 import { useSession } from "next-auth/react";
 
 const Page = () => {
   const { data: session, status } = useSession();
+  const [userEmail, setUserEmail] = useState("");
+  const [selectedTaskIds, setSelectedTaskIds] = useState([]);
+
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.email) {
+      setUserEmail(session.user.email);
+    }
+  }, [session, status]);
+
+  console.log(session?.user);
+
   const [open, setOpen] = useState(false);
   const [taskData, setTaskData] = useState({
     title: "",
@@ -32,13 +43,6 @@ const Page = () => {
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-
-  // Set userId from session directly
-  useEffect(() => {
-    if (status === "authenticated" && session?.user?.id) {
-      setTaskData((prev) => ({ ...prev, userId: session.user.id }));
-    }
-  }, [session, status]);
 
   const handleAddTaskOpen = () => setOpen(true);
   const handleAddTaskClose = () => {
@@ -60,18 +64,19 @@ const Page = () => {
     setMessage("");
 
     try {
-      // Add task directly using the updated taskData
-      const response = await addTask(taskData);
+      const user = await getUser(userEmail);
+
+      const updatedTaskData = { ...taskData, userId: user.data._id };
+
+      const response = await addTask(updatedTaskData);
       setMessage(response.message);
 
-      // Reset task data after successful addition
       setTaskData({
         title: "",
         priority: 1,
-        status: "Pending",
+        status: "pending",
         startTime: "",
         endTime: "",
-        userId: session?.user?.id, // Keep userId intact
       });
       setOpen(false);
     } catch (error) {
@@ -131,8 +136,8 @@ const Page = () => {
             fullWidth
             margin="dense"
           >
-            <ToggleButton value="Pending">Pending</ToggleButton>
-            <ToggleButton value="Finished">Finished</ToggleButton>
+            <ToggleButton value="pending">Pending</ToggleButton>
+            <ToggleButton value="finished">Finished</ToggleButton>
           </ToggleButtonGroup>
 
           <TextField
