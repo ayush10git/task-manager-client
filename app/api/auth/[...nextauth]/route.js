@@ -9,7 +9,6 @@ export const authOptions = {
     CredentialsProvider({
       name: "credentials",
       credentials: {},
-
       async authorize(credentials) {
         const { email, password } = credentials;
 
@@ -18,18 +17,23 @@ export const authOptions = {
           const user = await User.findOne({ email });
 
           if (!user) {
-            return null;
+            return null; // Return null if user not found
           }
 
           const passwordsMatch = await bcrypt.compare(password, user.password);
 
           if (!passwordsMatch) {
-            return null;
+            return null; // Return null if password is incorrect
           }
 
-          return user;
+          return {
+            id: user._id.toString(),
+            name: user.name, // Add this if available
+            email: user.email,
+          };
         } catch (error) {
-          console.log("Error: ", error);
+          console.log("Error during authorization:", error);
+          return null; // Fail-safe return
         }
       },
     }),
@@ -38,6 +42,20 @@ export const authOptions = {
     strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      session.user.id = token.id;
+      session.user.email = token.email;
+      return session;
+    },
+  },
   pages: {
     signIn: "/",
   },

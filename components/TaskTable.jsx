@@ -179,8 +179,6 @@ export default function TaskTable() {
     }
   }, [userEmail, taskData]);
 
-  console.log(tasks);
-
   const handleEditTaskOpen = (task) => {
     setTaskData(task);
     setOpen(true);
@@ -321,14 +319,13 @@ export default function TaskTable() {
                 <MenuItem value="pending">Pending</MenuItem>
                 <MenuItem value="finished">Finished</MenuItem>
               </Select>
-              <Button
+              <button
                 className="px-3 py-1 bg-red-500"
                 onClick={handleDeleteSelectedTasks}
-                disabled={selected.length === 0}
               >
                 <span className="text-white">Delete</span>
                 <DeleteIcon className="text-white" />
-              </Button>
+              </button>
             </div>
           </Toolbar>
 
