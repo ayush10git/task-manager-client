@@ -156,6 +156,7 @@ export default function TaskTable() {
   const [taskData, setTaskData] = useState(null);
   const { data: session, status } = useSession();
   const [userEmail, setUserEmail] = useState("");
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     if (status === "authenticated" && session?.user?.email) {
@@ -178,7 +179,6 @@ export default function TaskTable() {
       fetchTasks();
     }
   }, [userEmail, taskData]);
-
 
   const handleEditTaskOpen = (task) => {
     setTaskData(task);
@@ -272,7 +272,10 @@ export default function TaskTable() {
         console.error("Task ID is missing!");
         return;
       }
-
+      if (taskData.startTime > taskData.endTime) {
+        setMessage("End Time must be greater than Start Time");
+        return;
+      }
       const updatedTask = await editTask(taskData._id, taskData);
 
       setTasks((prevTasks) =>
@@ -489,6 +492,7 @@ export default function TaskTable() {
             Save
           </Button>
         </DialogActions>
+        {message && <p className="text-center text-red-500 mt-2">{message}</p>}
       </Dialog>
     </div>
   );

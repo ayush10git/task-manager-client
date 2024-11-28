@@ -68,6 +68,13 @@ const Page = () => {
 
       const updatedTaskData = { ...taskData, userId: user.data._id };
 
+      
+
+      if(taskData.startTime > taskData.endTime) {
+        setMessage("End Time must be greater than Start Time");
+        return;
+      }
+
       const response = await addTask(updatedTaskData);
       setMessage(response.message);
 
